@@ -14,7 +14,7 @@ The solution you've been waiting for:
           <sub>Built by Nikhil Kumar, CSE student</sub>
       </td>
       <td align="right" valign="top" width="120">
-        <img src="icon.ico" alt="AppUP Logo" width="100"/>
+        <img src="icon.png" alt="AppUP Logo" width="100"/>
       </td>
     </tr>
   </table>
@@ -23,9 +23,8 @@ The solution you've been waiting for:
    - Automatically checks for updates for popular apps not available on the Microsoft Store (e.g., Chrome, Zoom, VLC, Capcut, and over 1500 additional apps)
   - Shows both the current version and the available update version for each app
   - Update all apps at once with a single click, or choose specific apps to update individually
-  - Python-based CLI for easy extensibility
   - Notifies successful updates and alerts if something goes wrong
-  - Retro-styled hacking vibe—play it cool in front of friends and feel like you're in a sci-fi movie!
+  - "Retro-styled hacking vibe" innterface to feel like you're in a sci-fi movie!
 
 ---
 
@@ -40,7 +39,7 @@ The solution you've been waiting for:
   <li><i>Windows 11 or 10 version 1809 (build 17763) or later.</i></li>
 </ul>
 
-1. Download `appup-update-engine.exe` from the `bin/` folder in this repository or from GitHub Releases.
+1. Download `AppUp.exe` from this repository or from latest Releases.
 
      > 🛡️ **Virus Scanned**: This executable was scanned with VirusTotal  
      > [[Click Here To See Reports]](https://www.virustotal.com/gui/file/0dc9936776f9f39a2a2c882385de0736df1cd83eba3ceec68510cadd5126a371)  
@@ -83,7 +82,7 @@ The solution you've been waiting for:
 
 1. Clone the repository:
    ```sh
-   git clone https://github.com/your-username/appup-update-engine.git
+   git clone https://github.com/nikhilthesingh/AppUP.git
    cd appup-update-engine
    ```
 
@@ -94,7 +93,7 @@ The solution you've been waiting for:
 
 3. Run the script:
    ```sh
-   python ver5_deep.py
+   python code_byNikhil.py
    ```
 
 4. Refer to <b>steps 4–8</b> in the section above to complete the update process.
