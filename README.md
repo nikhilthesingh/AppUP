@@ -4,20 +4,14 @@ Now tired of manually checking for updates or downloading installers for each ap
 The solution you've been waiting for:
 
   ## 🚀 Overview
-  <table>
-    <tr>
-      <td>
-        <b>AppUP</b> is a retro matrix-styled, Python-based CLI tool that updates most of the known apps on your PC which you may have installed outside the store.<br>
-            It automates the process of checking for and updating most of the applications that are ignored by the Microsoft Store, saving you time and hassle.<br>
-            With AppUP, you can keep all your essential software up to date—effortlessly.<br>
-          <br>
-          <sub>Built by Nikhil Kumar, CSE student</sub>
-      </td>
-      <td align="right" valign="top" width="120">
-        <img src="icon.png" alt="AppUP Logo" width="100"/>
-      </td>
-    </tr>
-  </table>
+  <p align="left">
+  <img src="icon.png" alt="AppUP Logo" width="180" align="right" />
+  <b>AppUP</b> is a retro matrix-styled, Python-based CLI tool that updates most of the known apps on your PC which you may have installed outside the store.<br>
+  It automates the process of checking for and updating most of the applications that are ignored by the Microsoft Store, saving you time and hassle.<br>
+  With AppUP, you can keep all your essential software up to date—effortlessly.<br>
+  <br>
+  <sub>Built by Nikhil Kumar, CSE student</sub>
+</p>
 
 ## ✨ Features
    - Automatically checks for updates for popular apps not available on the Microsoft Store (e.g., Chrome, Zoom, VLC, Capcut, and over 1500 additional apps)
@@ -126,3 +120,8 @@ Here are solutions to some common problems you may encounter:
   - Check your internet connection.
   - Make sure you have administrator privileges.
   - Some apps may require you to close them before updating.
+ 
+## ©️ License
+
+You may use and share this project for personal or commercial use with credit to me - Nikhil Kumar [https://linktr.ee/the_nikhil] .<br>
+Modification or redistribution requires written permission from the author.
