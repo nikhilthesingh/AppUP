@@ -2,6 +2,7 @@ import subprocess
 import sys
 import time
 import random
+import re
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
@@ -130,6 +131,8 @@ def upgrade_progress(app_name, current, new, app_id):
     console.print("[dim] Microsoft is not responsible for, nor does it grant any licenses to, third-party packages.[/]\n")
 
     try:
+        output_lines = []
+
         process = subprocess.Popen(
             ["winget", "upgrade", "--id", app_id, "--accept-package-agreements", "--accept-source-agreements"],
             stdout=subprocess.PIPE,
@@ -147,7 +150,7 @@ def upgrade_progress(app_name, current, new, app_id):
                 if not line:
                     break
                 line = line.strip().lower()
-
+                output_lines.append(line)
                 if "Downloading http" in line and not downloading_done:
                     downloading_done = True
                 elif ("installing" in line or "Starting package install" in line) and not installing_shown:
@@ -168,10 +171,14 @@ def upgrade_progress(app_name, current, new, app_id):
 
         monitor_thread.join()
 
+        full_output = "".join(output_lines)
         # Final status check
         if process.wait() == 0:
             show_status(f"{app_name} updated successfully", "success")
             return True
+        elif "the install technology is different" in full_output:
+            show_status(f"Manual update required for {app_name}. Please uninstall the old version first.", "warning")
+            return False
         else:
             show_status(f"Failed to update {app_name} (exit code {process.returncode})", "error")
             return False
@@ -225,41 +232,85 @@ def handle_first_time_setup():
         return False
 
 def get_upgradable_apps():
-    """Fetch list of upgradable apps using winget"""
+    """
+    Fetches upgradable apps using a precise, header-based, fixed-width parsing logic.
+    """
     with console.status("[dim]Scanning the system for installed packages...[/]", spinner="dots", speed=0.8):
         time.sleep(4)
     try:
-        result = subprocess.run(["winget", "upgrade"], capture_output=True, text=True, timeout=30)
+        result = subprocess.run(
+            ["winget", "upgrade"],
+            capture_output=True,
+            text=True,
+            timeout=60,
+            encoding='utf-8',
+            errors='ignore'
+        )
+        
         if result.stderr and ("must be accepted" in result.stderr.lower() or "source agreements" in result.stderr.lower()):
             handle_first_time_setup()
-        if result.returncode != 0:
+        if result.returncode != 0 and "No installed package found matching input criteria" not in result.stdout:
             console.print(f"[red]Error running update engine: {result.stderr or result.stdout}[/red]")
             sys.exit(1)
+
         lines = result.stdout.splitlines()
         apps = []
-        parsing = False
-        col_positions = {}
-        for idx, line in enumerate(lines):
+        header_line = ""
+        header_found = False
+
+        # Find the header line first
+        for line in lines:
             if line.strip().startswith("Name"):
-                parsing = True
-                header = line
-                col_positions['name'] = header.index("Name")
-                col_positions['id'] = header.index("Id")
-                col_positions['version'] = header.index("Version")
-                col_positions['available'] = header.index("Available")
+                header_line = line
+                header_found = True
+                break # Stop once header is found
+
+        if not header_found:
+            return [] # No data to parse
+
+        # STEP 1: Precisely determine column start positions from the header.
+        positions = {
+            'Name': header_line.find("Name"),
+            'Id': header_line.find("Id"),
+            'Version': header_line.find("Version"),
+            'Available': header_line.find("Available"),
+            'Source': header_line.find("Source")
+        }
+
+        # Filter out any headers that weren't found
+        valid_positions = {k: v for k, v in positions.items() if v != -1}
+        
+        # Sort headers by their start position to create boundaries
+        sorted_headers = sorted(valid_positions.items(), key=lambda item: item[1])
+
+        # STEP 2: Create precise (start, end) slices for each column
+        slices = {}
+        for i in range(len(sorted_headers)):
+            current_header, start_pos = sorted_headers[i]
+            # The end position is the start of the next header, or the end of the line for the last one
+            end_pos = sorted_headers[i+1][1] if i + 1 < len(sorted_headers) else len(header_line) + 20
+            slices[current_header] = (start_pos, end_pos)
+
+        # STEP 3: Loop through all lines and apply the slices
+        for line in lines:
+            # Skip any line that is not data
+            if line.strip().startswith("Name") or "---" in line or not line.strip():
                 continue
-            if not parsing or line.strip() == "" or "---" in line or line.strip().startswith("Source"):
-                continue
+            
             try:
-                name = line[col_positions['name']:col_positions['id']].strip()
-                app_id = line[col_positions['id']:col_positions['version']].strip()
-                current_version = line[col_positions['version']:col_positions['available']].strip()
-                available_version = line[col_positions['available']:].strip().split()[0]
-                if name and current_version and available_version and app_id:
+                # Slice each part of the line using the exact boundaries from the header
+                name = line[slices['Name'][0]:slices['Name'][1]].strip()
+                app_id = line[slices['Id'][0]:slices['Id'][1]].strip()
+                current_version = line[slices['Version'][0]:slices['Version'][1]].strip()
+                available_version = line[slices['Available'][0]:slices['Available'][1]].strip()
+                
+                if name and app_id and current_version and available_version:
                     apps.append((name, current_version, available_version, app_id))
-            except Exception:
-                continue
+            
+            except (KeyError, IndexError):
+                continue        
         return apps
+
     except subprocess.SubprocessError as e:
         console.print(f"[red]Error running update engine: {e}[/red]")
         sys.exit(1)
