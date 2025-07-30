@@ -13,6 +13,9 @@ The solution you've been waiting for:
   <sub>Built by Nikhil Kumar, CSE student</sub>
 </p>
 
+
+https://github.com/user-attachments/assets/ce3243c0-5fa0-4bf7-bef1-a27e824c3961
+
 ## ✨ Features
    - Automatically checks for updates for popular apps not available on the Microsoft Store (e.g., Chrome, Zoom, VLC, Capcut, and over 1500 additional apps)
   - Shows both the current version and the available update version for each app
